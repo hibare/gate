@@ -57,6 +57,14 @@ repos:
       - id: golangci-lint-mod
         args: [--fix]
 
+  # Python hooks
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 488940d9de1b658fac229e34c521d75a6ea476f2 # v0.14.5
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
   # Dockerfile hooks
   - repo: https://github.com/hadolint/hadolint
     rev: 57e1618d78fd469a92c1e584e8c9313024656623 # v2.14.0
@@ -89,4 +97,18 @@ repos:
         entry: bash -c 'helm template deployments/helm/gate > /dev/null'
         language: system
         files: ^deployments/helm/gate/.*\.(yaml|yml|tpl)$
+        pass_filenames: false
+
+      - id: compose-images-multiplatform
+        name: Compose Images Multi-Platform
+        entry: scripts/check-compose.py
+        language: system
+        files: (^|/)(docker-)?compose([.-][^/]*)?\.ya?ml$
+        pass_filenames: true
+
+      - id: versions-sync
+        name: Versions Sync (go.mod ↔ versions.env ↔ registry)
+        entry: scripts/versions.py
+        language: system
+        files: ^(go\.mod|versions\.env)$
         pass_filenames: false

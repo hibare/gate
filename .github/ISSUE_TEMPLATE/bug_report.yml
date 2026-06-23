@@ -1,0 +1,122 @@
+# Copyright 2026 Thomson Reuters
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Bug report
+description: Report a defect in GATE (server, CLI, Helm chart, or Terraform modules).
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report.
+
+        **Do not include secrets, tokens, or private OIDC claims in this issue.**
+        Redact request/response bodies and log lines before submitting.
+        For security vulnerabilities, see [SECURITY.md](../blob/main/SECURITY.md) instead.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A clear, one- to two-sentence description of the bug.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Minimal, deterministic steps. Include exact commands and configuration excerpts where relevant.
+      placeholder: |
+        1. Configure GATE with ...
+        2. Issue a request to /v1/exchange with ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include error messages, HTTP status codes, and relevant (redacted) log lines.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected component
+      multiple: true
+      options:
+        - Server / token exchange
+        - OIDC validation
+        - Authorizer / policy evaluation
+        - Audit backends
+        - Selector / rate limiting
+        - GitHub client
+        - Database / migrations
+        - Telemetry / observability
+        - Helm chart
+        - Terraform modules
+        - CLI / build tooling
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: GATE version
+      description: Output of `gate version` or the image tag / commit SHA in use.
+      placeholder: v0.4.2 or sha-abcdef0
+    validations:
+      required: true
+
+  - type: input
+    id: deployment
+    attributes:
+      label: Deployment target
+      description: Where is GATE running?
+      placeholder: ECS Fargate / EKS / local docker compose / bare metal
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant configuration
+      description: Redacted excerpt of `config.yaml` (or Helm `values.yaml`) showing the misbehaving feature.
+      render: yaml
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / traces
+      description: Redacted log lines, trace IDs, or audit entries that demonstrate the issue.
+      render: text
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else that might help — workarounds tried, related issues, upstream bugs.

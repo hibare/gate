@@ -17,7 +17,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     target-branch: "main"
     cooldown:
       default-days: 10
@@ -29,7 +29,7 @@ updates:
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     target-branch: "main"
     cooldown:
       default-days: 10
@@ -45,7 +45,7 @@ updates:
       - "/"
       - "/local"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     target-branch: "main"
     cooldown:
       default-days: 10
@@ -57,11 +57,39 @@ updates:
   - package-ecosystem: "docker-compose"
     directory: "/local"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     target-branch: "main"
     cooldown:
       default-days: 10
     groups:
       docker-compose:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "pre-commit"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "main"
+    cooldown:
+      default-days: 10
+    groups:
+      pre-commit:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directories:
+      - "/deployments/terraform/modules/aws/cloudfront"
+      - "/deployments/terraform/modules/aws/ecr"
+      - "/deployments/terraform/modules/aws/ecs"
+      - "/deployments/terraform/modules/aws/eks"
+    schedule:
+      interval: "weekly"
+    target-branch: "main"
+    cooldown:
+      default-days: 10
+    groups:
+      terraform:
         patterns:
           - "*"

@@ -25,6 +25,39 @@ go.work
 go.work.sum
 
 # -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+*.egg-info/
+*.egg
+build/
+develop-eggs/
+eggs/
+.eggs/
+wheels/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Testing and coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+
+# -----------------------------------------------------------------------------
 # IDE and Editors
 # -----------------------------------------------------------------------------
 .idea/

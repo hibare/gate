@@ -12,13 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# go.mod is canonical for GO_VERSION; versions.env for base image digests.
+GO_VERSION := $(shell awk '/^go [0-9]/{print $$2; exit}' go.mod)
+include versions.env
+export GO_VERSION GOLANG_DIGEST DISTROLESS_DIGEST
+
 # =============================================================================
 # Main variables
 # =============================================================================
 BINARY_NAME := gate
 DOCKER_IMAGE := gate
 DOCKER_TAG := latest
-GO_VERSION := $(shell grep '^go ' go.mod | awk '{print $$2}')
 
 # Container tool detection (prefer podman, fallback to docker)
 CONTAINER_TOOL := $(shell command -v podman 2>/dev/null || command -v docker 2>/dev/null || echo "docker")
@@ -62,34 +66,6 @@ COMPOSE_CMD := HOST_UID=$(UID) HOST_GID=$(GID) CONFIG_FILE=$(CONFIG_FILE) GOLANG
 VOLUMES_DIR := ./local/.volumes
 # =============================================================================
 
-# =============================================================================
-# Base image digests
-# =============================================================================
-# All base images are pinned by SHA256 digest for security.
-# Digests are architecture-specific and selected automatically based on PLATFORM.
-#
-# To update digests:
-# podman manifest inspect <image:tag> | jq '.manifests[] | select(.platform.architecture == "amd64" or .platform.architecture == "arm64") | {arch: .platform.architecture, digest}'
-#
-# Golang Alpine (builder image)
-# Image: public.ecr.aws/docker/library/golang:1.26.1-alpine
-GOLANG_DIGEST_AMD64 := sha256:d337ecb3075f0ec76d81652b3fa52af47c3eba6c8ba9f93b835752df7ce62946
-GOLANG_DIGEST_ARM64 := sha256:c500d8fac0707aa2a887d7e426530cfef09549c9c87ac0c2998543a89ce89d86
-
-# Distroless Static (runtime image)
-# Image: gcr.io/distroless/static-debian13:nonroot
-DISTROLESS_DIGEST_AMD64 := sha256:88a46f645e304fc0dcfbdacdfa338ce02d9890df5f936872243d553278deae92
-DISTROLESS_DIGEST_ARM64 := sha256:d20ee35777d1be105385ebbbf989178e5d3d0d254059e8a09a38ef64aebc741a
-
-# Select digests based on PLATFORM
-ifeq ($(PLATFORM),linux/arm64)
-    GOLANG_DIGEST := $(GOLANG_DIGEST_ARM64)
-    DISTROLESS_DIGEST := $(DISTROLESS_DIGEST_ARM64)
-else
-    GOLANG_DIGEST := $(GOLANG_DIGEST_AMD64)
-    DISTROLESS_DIGEST := $(DISTROLESS_DIGEST_AMD64)
-endif
-# =============================================================================
 
 # ============================================================================
 # Targets
@@ -139,6 +115,7 @@ help:
 	@echo "Information:"
 	@echo "  make version              - Show version info"
 	@echo "  make digests              - Show current base image digests"
+	@echo "  make update-digests       - Refresh digests in versions.env from registries"
 	@echo ""
 	@echo ""
 	@echo "Container tool:   $(CONTAINER_TOOL)"
@@ -329,21 +306,23 @@ version:
 
 .PHONY: digests
 digests:
-	@echo "Base Image Digests for $(PLATFORM)"
-	@echo "========================================"
+	@echo "Base image digests (versions.env)"
+	@echo "================================="
+	@echo ""
+	@echo "Go version: $(GO_VERSION)"
 	@echo ""
 	@echo "Golang Alpine (builder):"
-	@echo "  Image: public.ecr.aws/docker/library/golang:$(GO_VERSION)-alpine"
-	@echo "  AMD64: $(GOLANG_DIGEST_AMD64)"
-	@echo "  ARM64: $(GOLANG_DIGEST_ARM64)"
-	@echo "  Selected: $(GOLANG_DIGEST)"
+	@echo "  Image:  public.ecr.aws/docker/library/golang:$(GO_VERSION)-alpine"
+	@echo "  Digest: $(GOLANG_DIGEST)"
 	@echo ""
 	@echo "Distroless Static (runtime):"
-	@echo "  Image: gcr.io/distroless/static-debian13:nonroot"
-	@echo "  AMD64: $(DISTROLESS_DIGEST_AMD64)"
-	@echo "  ARM64: $(DISTROLESS_DIGEST_ARM64)"
-	@echo "  Selected: $(DISTROLESS_DIGEST)"
+	@echo "  Image:  gcr.io/distroless/static-debian13:nonroot"
+	@echo "  Digest: $(DISTROLESS_DIGEST)"
 	@echo ""
-	@echo "To update digests, run:"
-	@echo "  podman manifest inspect <image:tag> | jq '.manifests[] | select(.platform.architecture == \"amd64\" or .platform.architecture == \"arm64\")'"
+	@echo "To refresh digests after bumping the \`go\` directive in go.mod:"
+	@echo "  make update-digests"
+
+.PHONY: update-digests
+update-digests:
+	@scripts/versions.py
 # =============================================================================

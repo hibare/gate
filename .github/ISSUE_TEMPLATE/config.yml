@@ -12,26 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Release Drafter
-
-on:
-  push:
-    branches:
-      - main
-  pull_request_target:
-    types: [opened, reopened, synchronize]
-
-permissions:
-  contents: read
-
-jobs:
-  update_release_draft:
-    permissions:
-      contents: write
-      pull-requests: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Update release draft
-        uses: release-drafter/release-drafter@693d20e7c1ce1a81d3a41962f85914253b518449 # v7.3.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/thomsonreuters/gate/security/advisories/new
+    about: Please report security vulnerabilities privately. See SECURITY.md for the disclosure policy; do not open a public issue.
+  - name: Question or usage help
+    url: https://github.com/thomsonreuters/gate/discussions
+    about: For questions, ideas, and usage help, please start a discussion.
